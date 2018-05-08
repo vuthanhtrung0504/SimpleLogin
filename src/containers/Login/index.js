@@ -12,6 +12,11 @@ import {
 import { connect } from 'react-redux';
 import { Field, reduxForm } from 'redux-form';
 
+const data = {
+  email: 'admin',
+  password: 'admin123'
+};
+
 const required = value => (value ? undefined : 'Required');
 const maxLength = max => value =>
   value && value.length > max ? `Must be ${max} characters or less` : undefined;
@@ -29,15 +34,16 @@ const alphaNumeric = value =>
     : undefined;
 
 const mapStateToProps = state => ({
-  token: state.authReducer.token
+  token: state.authReducer.token,
+  initialValues: state.authReducer.data
 });
 
 const mapDispatchToProps = dispatch => ({
-  login: payload => dispatch({ type: 'AUTH', payload })
+  login: payload => dispatch({ type: 'AUTH', payload }),
+  load: payload => dispatch({ type: 'LOAD', payload })
 });
 class Login extends PureComponent {
   handleLogin = values => {
-    console.log('values', values);
     this.props.login({
       username: values.email,
       password: values.password
@@ -60,6 +66,14 @@ class Login extends PureComponent {
           )}
       </View>
     );
+  }
+
+  clearPasswordInput() {
+    this.props.load({ password: '' });
+  }
+
+  clearEmailInput() {
+    this.props.load({ email: '' });
   }
 
   render() {
@@ -91,13 +105,49 @@ class Login extends PureComponent {
         >
           <Text> Login </Text>
         </Button>
+
+        <Button
+          style={{
+            width: '100%',
+            marginTop: 30,
+            alignSelf: 'center',
+            justifyContent: 'center'
+          }}
+          onPress={() => this.props.load(data)}
+        >
+          <Text> Load Data </Text>
+        </Button>
+
+        <Button
+          style={{
+            width: '100%',
+            marginTop: 30,
+            alignSelf: 'center',
+            justifyContent: 'center'
+          }}
+          onPress={() => this.clearEmailInput()}
+        >
+          <Text> Clear Email Input </Text>
+        </Button>
+
+        <Button
+          style={{
+            width: '100%',
+            marginTop: 30,
+            alignSelf: 'center',
+            justifyContent: 'center'
+          }}
+          onPress={() => this.clearPasswordInput()}
+        >
+          <Text> Clear Password Input </Text>
+        </Button>
       </Container>
     );
   }
 }
+const LoginScreen = reduxForm({
+  form: 'login',
+  enableReinitialize: true
+})(Login);
 
-const LoginScreen = connect(mapStateToProps, mapDispatchToProps)(Login);
-
-export default reduxForm({
-  form: 'login'
-})(LoginScreen);
+export default connect(mapStateToProps, mapDispatchToProps)(LoginScreen);
